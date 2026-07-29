@@ -1,0 +1,416 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Common Structural Variables */
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 20px;
+  
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.3s ease-in-out;
+}
+
+/* 1. Dark Theme (Apple Space Gray / Default) */
+:root[data-theme="dark"] {
+  --bg-primary-rgb: 15, 23, 42;
+  --bg-secondary-rgb: 30, 41, 59;
+  --bg-tertiary-rgb: 51, 65, 85;
+  --text-primary-rgb: 248, 250, 252;
+  --text-secondary-rgb: 148, 163, 184;
+  --accent-primary-rgb: 59, 130, 246;
+  --accent-secondary-rgb: 139, 92, 246;
+
+  --bg-primary: rgb(var(--bg-primary-rgb));
+  --bg-secondary: rgb(var(--bg-secondary-rgb));
+  --bg-tertiary: rgb(var(--bg-tertiary-rgb));
+  --text-primary: rgb(var(--text-primary-rgb));
+  --text-secondary: rgb(var(--text-secondary-rgb));
+  --accent-primary: rgb(var(--accent-primary-rgb));
+  --accent-secondary: rgb(var(--accent-secondary-rgb));
+  --accent-gradient: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  
+  --border-color: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(30, 41, 59, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
+
+  /* Element Plus Mappings */
+  --el-color-primary: var(--accent-primary);
+  --el-bg-color: var(--bg-primary);
+  --el-bg-color-overlay: var(--glass-bg);
+  --el-text-color-primary: var(--text-primary);
+  --el-text-color-regular: var(--text-secondary);
+  --el-border-color: var(--border-color);
+  --el-border-color-light: var(--glass-border);
+  --el-fill-color-blank: rgba(0,0,0,0.2);
+}
+
+/* 2. Light Theme (Apple Moonlight) */
+:root[data-theme="light"] {
+  --bg-primary-rgb: 248, 250, 252;
+  --bg-secondary-rgb: 255, 255, 255;
+  --bg-tertiary-rgb: 241, 245, 249;
+  --text-primary-rgb: 15, 23, 42;
+  --text-secondary-rgb: 100, 116, 139;
+  --accent-primary-rgb: 37, 99, 235;
+  --accent-secondary-rgb: 109, 40, 217;
+
+  --bg-primary: rgb(var(--bg-primary-rgb));
+  --bg-secondary: rgb(var(--bg-secondary-rgb));
+  --bg-tertiary: rgb(var(--bg-tertiary-rgb));
+  --text-primary: rgb(var(--text-primary-rgb));
+  --text-secondary: rgb(var(--text-secondary-rgb));
+  --accent-primary: rgb(var(--accent-primary-rgb));
+  --accent-secondary: rgb(var(--accent-secondary-rgb));
+  --accent-gradient: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  
+  --border-color: rgba(0, 0, 0, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 0 20px rgba(37, 99, 235, 0.2);
+
+  /* Element Plus Mappings */
+  --el-color-primary: var(--accent-primary);
+  --el-bg-color: var(--bg-primary);
+  --el-bg-color-overlay: var(--glass-bg);
+  --el-text-color-primary: var(--text-primary);
+  --el-text-color-regular: var(--text-secondary);
+  --el-border-color: var(--border-color);
+  --el-border-color-light: var(--glass-border);
+  --el-fill-color-blank: rgba(255,255,255,0.8);
+}
+
+/* 3. Ocean Theme (Deep Blue) */
+:root[data-theme="ocean"] {
+  --bg-primary-rgb: 8, 51, 68;
+  --bg-secondary-rgb: 22, 78, 99;
+  --bg-tertiary-rgb: 21, 94, 117;
+  --text-primary-rgb: 207, 250, 254;
+  --text-secondary-rgb: 103, 232, 249;
+  --accent-primary-rgb: 6, 182, 212;
+  --accent-secondary-rgb: 59, 130, 246;
+
+  --bg-primary: rgb(var(--bg-primary-rgb));
+  --bg-secondary: rgb(var(--bg-secondary-rgb));
+  --bg-tertiary: rgb(var(--bg-tertiary-rgb));
+  --text-primary: rgb(var(--text-primary-rgb));
+  --text-secondary: rgb(var(--text-secondary-rgb));
+  --accent-primary: rgb(var(--accent-primary-rgb));
+  --accent-secondary: rgb(var(--accent-secondary-rgb));
+  --accent-gradient: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  
+  --border-color: rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(22, 78, 99, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(6, 182, 212, 0.4);
+
+  /* Element Plus Mappings */
+  --el-color-primary: var(--accent-primary);
+  --el-bg-color: var(--bg-primary);
+  --el-bg-color-overlay: var(--glass-bg);
+  --el-text-color-primary: var(--text-primary);
+  --el-text-color-regular: var(--text-secondary);
+  --el-border-color: var(--border-color);
+  --el-border-color-light: var(--glass-border);
+  --el-fill-color-blank: rgba(0,0,0,0.2);
+}
+
+/* 4. Violet Theme (Morandi Purple) */
+:root[data-theme="violet"] {
+  --bg-primary-rgb: 46, 16, 101;
+  --bg-secondary-rgb: 76, 29, 149;
+  --bg-tertiary-rgb: 91, 33, 182;
+  --text-primary-rgb: 245, 243, 255;
+  --text-secondary-rgb: 196, 181, 253;
+  --accent-primary-rgb: 139, 92, 246;
+  --accent-secondary-rgb: 217, 70, 239;
+
+  --bg-primary: rgb(var(--bg-primary-rgb));
+  --bg-secondary: rgb(var(--bg-secondary-rgb));
+  --bg-tertiary: rgb(var(--bg-tertiary-rgb));
+  --text-primary: rgb(var(--text-primary-rgb));
+  --text-secondary: rgb(var(--text-secondary-rgb));
+  --accent-primary: rgb(var(--accent-primary-rgb));
+  --accent-secondary: rgb(var(--accent-secondary-rgb));
+  --accent-gradient: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  
+  --border-color: rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(76, 29, 149, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.4);
+
+  /* Element Plus Mappings */
+  --el-color-primary: var(--accent-primary);
+  --el-bg-color: var(--bg-primary);
+  --el-bg-color-overlay: var(--glass-bg);
+  --el-text-color-primary: var(--text-primary);
+  --el-text-color-regular: var(--text-secondary);
+  --el-border-color: var(--border-color);
+  --el-border-color-light: var(--glass-border);
+  --el-fill-color-blank: rgba(0,0,0,0.2);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+  font-optical-sizing: auto;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+* {
+  transition: border-color 0.5s ease;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Glassmorphism utilities */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.glass-panel:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+/* Apple Design Typography */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.02em;
+}
+
+/* Base UI Elements */
+input, textarea, button {
+  font-family: inherit;
+  outline: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+.btn-primary {
+  background: var(--accent-gradient);
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--border-radius-sm);
+  font-weight: 500;
+  transition: transform 100ms ease-out, filter var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: var(--border-radius-sm);
+  color: var(--text-secondary);
+  transition: transform 100ms ease-out, background var(--transition-fast), color var(--transition-fast);
+  background: rgba(255,255,255,0.05);
+}
+
+.btn-icon:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--text-primary);
+}
+
+.btn-icon:active {
+  transform: scale(0.95);
+}
+
+.input-base {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.8rem 1rem;
+  border-radius: var(--border-radius-sm);
+  transition: var(--transition-fast);
+}
+
+.input-base:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(var(--accent-primary-rgb), 0.2);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary); 
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary); 
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary); 
+}
+
+/* Layout Utilities */
+.app-header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(var(--bg-primary-rgb), 0.8);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-title {
+  font-weight: 700;
+  font-size: 1.25rem;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* =========================================
+   Element Plus Apple-Design Overrides
+   ========================================= */
+
+/* Font inheritance */
+.el-select, .el-select-dropdown, .el-input, .el-button, .el-popper {
+  font-family: inherit !important;
+}
+
+/* Glassmorphism Dropdowns & Popovers */
+.el-popper.is-light, .el-popper.is-dark, .el-select-dropdown {
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(25px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 14px !important;
+  box-shadow: var(--shadow-md) !important;
+  padding: 4px !important;
+}
+
+/* Remove default Popper arrows (breaks glassmorphism edge) */
+.el-popper__arrow::before {
+  display: none !important; 
+}
+
+/* Option Items Apple styling */
+.el-select-dropdown__item {
+  border-radius: 8px;
+  margin: 2px 4px;
+  color: var(--text-primary) !important;
+  transition: background 150ms ease, transform 100ms ease !important;
+  padding: 0 12px !important;
+  background: transparent !important;
+}
+.el-select-dropdown__item.hover, 
+.el-select-dropdown__item:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+.el-select-dropdown__item.selected {
+  background-color: var(--accent-primary) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+.el-select-dropdown__item:active {
+  transform: scale(0.98);
+}
+
+/* Input / Select Trigger styling */
+.el-select .el-input__wrapper,
+.el-input__wrapper {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 0 0 1px var(--border-color) inset !important;
+  transition: box-shadow 0.2s ease, background-color 0.2s ease, transform 0.1s ease !important;
+  padding: 6px 12px !important;
+}
+
+html[data-theme="light"] .el-select .el-input__wrapper,
+html[data-theme="light"] .el-input__wrapper {
+  background-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.el-select .el-input__wrapper.is-focus,
+.el-input__wrapper.is-focus {
+  box-shadow: 0 0 0 1px var(--accent-primary) inset, 0 0 0 3px rgba(var(--accent-primary-rgb), 0.2) inset !important;
+  background-color: rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-theme="light"] .el-select .el-input__wrapper.is-focus,
+html[data-theme="light"] .el-input__wrapper.is-focus {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.el-select .el-input__inner {
+  color: var(--text-primary) !important;
+}
+
+/* Animations / Spring Physics Overrides */
+/* We override the default ease-in-out with a snappy Apple-like cubic-bezier */
+.el-zoom-in-top-enter-active,
+.el-zoom-in-top-leave-active,
+.el-zoom-in-bottom-enter-active,
+.el-zoom-in-bottom-leave-active {
+  transition: opacity 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}

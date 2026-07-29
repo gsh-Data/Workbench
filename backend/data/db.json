@@ -1,0 +1,19 @@
+{
+  "snippets": [],
+  "cronJobs": [],
+  "todos": [
+    {
+      "id": "1785317566304",
+      "text": "123123",
+      "completed": false,
+      "dueDate": "2026-07-29",
+      "status": "todo"
+    }
+  ],
+  "docsMetadata": [
+    {
+      "filename": "新建任务.md",
+      "taskId": "1785317566304"
+    }
+  ]
+}
