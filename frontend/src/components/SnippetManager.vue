@@ -27,7 +27,6 @@ const fetchData = async () => {
 };
 
 const activeTodos = computed(() => {
-  // Only show uncompleted tasks in the dropdown
   return todos.value.filter(t => t.status !== 'done' && !t.completed);
 });
 
@@ -66,11 +65,10 @@ const saveSnippet = async () => {
       tags: currentSnippet.value.tags ? currentSnippet.value.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
     };
     
-    // Only attach taskId if selected
     if (currentSnippet.value.taskId) {
       payload.taskId = currentSnippet.value.taskId;
     } else {
-      payload.taskId = null; // Clear out task id if unselected
+      payload.taskId = null;
     }
 
     if (isEditing.value) {
@@ -105,236 +103,115 @@ onMounted(fetchData);
 </script>
 
 <template>
-  <div class="glass-panel widget">
-    <div class="widget-header">
-      <h2 class="widget-title"><CodeSquare :size="20" color="var(--accent-secondary)" /> 知识片段</h2>
-      <button @click="openAddModal" class="btn-icon">
-        <Plus :size="18" />
+  <div class="bg-white border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col h-[400px] font-mono">
+    <!-- Header -->
+    <div class="p-4 border-b-4 border-black bg-yellow-300 flex justify-between items-center">
+      <h2 class="font-black uppercase text-black text-lg flex items-center gap-2">
+        <CodeSquare :size="22" class="text-black" />
+        知识片段 (SNIPPETS)
+      </h2>
+      <button @click="openAddModal" class="p-1 border-2 border-black bg-white hover:bg-yellow-400">
+        <Plus :size="18" class="text-black" />
       </button>
     </div>
     
-    <div class="widget-content">
-      <div v-if="loading" class="loading">片段加载中...</div>
-      <div v-else-if="snippets.length === 0" class="empty-state">暂无已保存的代码片段！</div>
+    <div class="p-4 flex-1 overflow-y-auto space-y-3">
+      <div v-if="loading" class="text-center font-bold text-black py-4 text-xs">[加载中...]</div>
+      <div v-else-if="snippets.length === 0" class="text-center font-bold text-black py-4 text-xs bg-yellow-50 border-2 border-black">[暂无保存的代码片段]</div>
       
-      <div v-else class="snippet-list">
-        <div v-for="snippet in snippets" :key="snippet.id" class="snippet-card relative group">
+      <div v-else class="space-y-3">
+        <div v-for="snippet in snippets" :key="snippet.id" class="border-2 border-black p-3 bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] relative group">
           
-          <div class="snippet-header">
-            <h3 class="snippet-title flex items-center gap-2">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-black text-sm text-black uppercase flex items-center gap-2">
               {{ snippet.title }}
-              <span v-if="snippet.taskId" class="text-[10px] bg-accent-secondary/20 text-accent-secondary px-1.5 py-0.5 rounded flex items-center gap-1 font-normal border border-accent-secondary/30 truncate max-w-[120px]">
-                <Link2 :size="10" class="shrink-0" /> <span class="truncate">{{ getTodoName(snippet.taskId) }}</span>
+              <span v-if="snippet.taskId" class="text-[9px] bg-yellow-300 text-black px-1.5 py-0.5 border border-black font-bold truncate max-w-[120px]">
+                <Link2 :size="10" class="inline shrink-0" /> <span class="truncate">{{ getTodoName(snippet.taskId) }}</span>
               </span>
             </h3>
             
-            <div class="snippet-actions opacity-0 group-hover:opacity-100 transition-opacity">
-              <button @click="copyCode(snippet.code)" class="btn-icon" title="复制内容">
-                <Copy :size="14" />
+            <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button @click="copyCode(snippet.code)" class="p-1 border border-black bg-white hover:bg-yellow-300" title="复制">
+                <Copy :size="12" />
               </button>
-              <button @click="openEditModal(snippet)" class="btn-icon" title="编辑/关联任务">
-                <Edit2 :size="14" />
+              <button @click="openEditModal(snippet)" class="p-1 border border-black bg-white hover:bg-yellow-300" title="编辑">
+                <Edit2 :size="12" />
               </button>
-              <button @click="deleteSnippet(snippet.id)" class="btn-icon delete-btn" title="删除">
-                <Trash2 :size="14" />
+              <button @click="deleteSnippet(snippet.id)" class="p-1 border border-black bg-red-500 text-white hover:bg-red-600" title="删除">
+                <Trash2 :size="12" />
               </button>
             </div>
           </div>
-          <pre class="snippet-code custom-scrollbar"><code>{{ snippet.code }}</code></pre>
-          <div class="snippet-tags" v-if="snippet.tags && snippet.tags.length > 0">
-            <span v-for="tag in snippet.tags" :key="tag" class="tag">#{{ tag }}</span>
+          
+          <pre class="bg-black text-[#00f0ff] p-3 border-2 border-black text-xs font-mono overflow-x-auto mb-2 shadow-[2px_2px_0px_0px_rgba(255,0,110,1)]"><code>{{ snippet.code }}</code></pre>
+          
+          <div class="flex flex-wrap gap-1" v-if="snippet.tags && snippet.tags.length > 0">
+            <span v-for="tag in snippet.tags" :key="tag" class="text-[9px] font-black uppercase bg-yellow-300 text-black px-1.5 py-0.5 border border-black">#{{ tag }}</span>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Snippet Editor Modal (Teleported) -->
-  <Teleport to="body">
-    <div v-if="showModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm" @click.self="closeModal">
-      <div 
-        class="bg-bg-secondary/90 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl w-full max-w-lg" 
-        v-motion 
-        :initial="{ y: 50, opacity: 0, scale: 0.95 }" 
-        :enter="{ y: 0, opacity: 1, scale: 1, transition: { type: 'spring', stiffness: 300, damping: 25 } }"
-      >
-        <div class="flex justify-between items-center mb-6">
-          <h3 class="text-xl font-bold flex items-center gap-2 text-text-primary">
-            <CodeSquare class="w-6 h-6 text-accent-secondary" />
-            {{ isEditing ? '编辑知识片段' : '新增知识片段' }}
-          </h3>
-          <button @click="closeModal" class="btn-icon w-8 h-8 rounded-full bg-white/5 hover:bg-white/10">
-            <X class="w-4 h-4" />
-          </button>
-        </div>
-        
-        <form @submit.prevent="saveSnippet" class="space-y-4">
-          <div>
-            <label class="block text-xs text-text-secondary mb-1 ml-1">标题</label>
-            <el-input v-model="currentSnippet.title" placeholder="输入片段或笔记标题" required autofocus />
-          </div>
-          
-          <div>
-            <label class="block text-xs text-text-secondary mb-1.5 ml-1">关联任务 (可选)</label>
-            <el-select 
-              v-model="currentSnippet.taskId" 
-              placeholder="(不关联任务) 全局知识"
-              clearable
-              class="w-full !bg-transparent"
-              popper-class="apple-dropdown"
-            >
-              <el-option label="(不关联任务) 全局知识" value="" />
-              <el-option 
-                v-for="todo in activeTodos" 
-                :key="todo.id" 
-                :label="todo.text" 
-                :value="todo.id"
-              />
-            </el-select>
-            <p class="text-[10px] text-text-secondary mt-1 ml-1">下拉选择正在进行的任务，以便双向绑定。</p>
-          </div>
-
-          <div>
-            <label class="block text-xs text-text-secondary mb-1 ml-1">内容 (代码/笔记)</label>
-            <el-input v-model="currentSnippet.code" type="textarea" :rows="6" placeholder="在此处粘贴代码或详细笔记..." required />
-          </div>
-
-          <div>
-            <label class="block text-xs text-text-secondary mb-1 ml-1">标签</label>
-            <el-input v-model="currentSnippet.tags" placeholder="例如: vue, frontend (用逗号分隔)" />
-          </div>
-          
-          <div class="flex justify-end gap-3 pt-4 border-t border-white/5">
-            <button type="button" @click="closeModal" class="px-5 py-2.5 rounded-xl font-medium text-text-secondary hover:bg-white/5 transition-colors">取消</button>
-            <button type="submit" class="bg-accent-secondary text-text-primary rounded-xl px-6 py-2.5 font-medium hover:brightness-110 transition-all shadow-[0_0_15px_rgba(var(--accent-secondary),0.4)]">
-              保存
+    <!-- Modal -->
+    <Teleport to="body">
+      <div v-if="showModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60" @click.self="closeModal">
+        <div class="bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] w-full max-w-lg">
+          <div class="flex justify-between items-center mb-4 pb-2 border-b-4 border-black">
+            <h3 class="text-lg font-black uppercase text-black flex items-center gap-2">
+              <CodeSquare class="w-5 h-5 text-black" />
+              {{ isEditing ? '编辑知识片段' : '新增知识片段' }}
+            </h3>
+            <button @click="closeModal" class="p-1 border-2 border-black bg-yellow-300">
+              <X class="w-4 h-4 text-black" />
             </button>
           </div>
-        </form>
+          
+          <form @submit.prevent="saveSnippet" class="space-y-3 font-mono">
+            <div>
+              <label class="block text-xs font-black text-black uppercase mb-1">标题</label>
+              <input v-model="currentSnippet.title" placeholder="输入片段标题" class="w-full border-4 border-black p-2 text-xs font-bold bg-white" required autofocus />
+            </div>
+            
+            <div>
+              <label class="block text-xs font-black text-black uppercase mb-1">关联任务 (可选)</label>
+              <el-select 
+                v-model="currentSnippet.taskId" 
+                placeholder="(不关联任务) 全局知识"
+                clearable
+                class="w-full"
+              >
+                <el-option label="(不关联任务) 全局知识" value="" />
+                <el-option 
+                  v-for="todo in activeTodos" 
+                  :key="todo.id" 
+                  :label="todo.text" 
+                  :value="todo.id"
+                />
+              </el-select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-black text-black uppercase mb-1">内容 (代码/笔记)</label>
+              <textarea v-model="currentSnippet.code" rows="5" placeholder="粘贴代码或笔记..." class="w-full border-4 border-black p-2 text-xs font-mono bg-white" required></textarea>
+            </div>
+
+            <div>
+              <label class="block text-xs font-black text-black uppercase mb-1">标签</label>
+              <input v-model="currentSnippet.tags" placeholder="例如: vue, frontend (用逗号分隔)" class="w-full border-4 border-black p-2 text-xs font-bold bg-white" />
+            </div>
+            
+            <div class="flex justify-end gap-2 pt-2 border-t-4 border-black">
+              <button type="button" @click="closeModal" class="px-4 py-2 border-2 border-black bg-gray-200 font-bold text-xs uppercase">取消</button>
+              <button type="submit" class="btn-primary text-xs py-2 px-5">
+                保存
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
-  </Teleport>
+    </Teleport>
+  </div>
 </template>
 
 <style scoped>
-.widget {
-  display: flex;
-  flex-direction: column;
-  height: 400px;
-}
-
-.widget-header {
-  padding: 1.2rem 1.5rem;
-  border-bottom: 1px solid var(--border-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.widget-title {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-.widget-content {
-  padding: 1.5rem;
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.snippet-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.snippet-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-md);
-  padding: 1.25rem;
-  transition: var(--transition-fast);
-}
-
-.snippet-card:hover {
-  border-color: rgba(var(--accent-secondary), 0.3);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.snippet-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
-}
-
-.snippet-title {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.snippet-actions {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.snippet-code {
-  background: #000;
-  padding: 1rem;
-  border-radius: 8px;
-  font-family: monospace;
-  font-size: 0.85rem;
-  color: #a78bfa;
-  overflow-x: auto;
-  margin-bottom: 0.75rem;
-  border: 1px solid var(--border-color);
-}
-
-.snippet-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.tag {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  background: rgba(255,255,255,0.05);
-  padding: 0.2rem 0.5rem;
-  border-radius: 10px;
-}
-
-.delete-btn {
-  transition: var(--transition-fast);
-}
-.delete-btn:hover {
-  color: #ef4444;
-}
-
-.empty-state, .loading {
-  text-align: center;
-  color: var(--text-secondary);
-  padding: 2rem 0;
-  font-size: 0.9rem;
-}
-
-.custom-scrollbar::-webkit-scrollbar {
-  height: 6px;
-  width: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent; 
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.1); 
-  border-radius: 4px;
-}
 </style>

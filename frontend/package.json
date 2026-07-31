@@ -11,6 +11,7 @@
   "dependencies": {
     "@lucide/vue": "^1.27.0",
     "@rolldown/binding-win32-x64-msvc": "^1.2.0",
+    "@tiptap/extension-image": "^3.29.2",
     "@tiptap/starter-kit": "^3.29.2",
     "@tiptap/vue-3": "^3.29.2",
     "@vueuse/motion": "^3.0.3",

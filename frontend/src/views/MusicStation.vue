@@ -11,65 +11,69 @@ const stations = [
     id: 'lofi-girl',
     name: 'Lo-Fi Girl (Chill Beats)',
     description: 'Beats to relax/study to',
-    url: 'https://stream.zeno.fm/f3wvbbqmdg8uv', // public lofi radio stream
+    url: 'https://stream.zeno.fm/f3wvbbqmdg8uv',
     cover: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=400&q=80'
   },
   {
     id: 'synthwave',
     name: 'Synthwave Radio',
     description: 'Retrowave & Cyberpunk vibes',
-    url: 'https://stream.zeno.fm/fubyq23c72zuv', // public synthwave stream
+    url: 'https://stream.zeno.fm/fubyq23c72zuv',
     cover: 'https://images.unsplash.com/photo-1614729939124-03290b55c9ce?auto=format&fit=crop&w=400&q=80'
   },
   {
     id: 'jazz',
     name: 'Smooth Jazz',
     description: 'Coffee shop ambiance',
-    url: 'https://stream.zeno.fm/kmvxpmdb44zuv', // public jazz stream
+    url: 'https://stream.zeno.fm/kmvxpmdb44zuv',
     cover: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=400&q=80'
   }
 ];
 </script>
 
 <template>
-  <div class="h-full space-y-6">
-    <div class="flex items-center gap-3 mb-8">
-      <div class="p-3 bg-accent-primary/20 rounded-2xl">
-        <Radio class="w-8 h-8 text-accent-primary" />
+  <div class="h-full space-y-6 font-mono">
+    <!-- Header Banner -->
+    <div class="flex items-center gap-4 bg-yellow-300 border-4 border-black p-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+      <div class="p-3 bg-black text-white border-2 border-black">
+        <Radio class="w-8 h-8 text-yellow-300" />
       </div>
       <div>
-        <h1 class="text-3xl font-bold text-text-primary">音乐台</h1>
-        <p class="text-text-secondary">深度工作时的沉浸式背景音乐。</p>
+        <h1 class="text-3xl font-black text-black uppercase tracking-wider">音乐台 (MUSIC STATION)</h1>
+        <p class="text-black font-bold uppercase text-xs">深度工作时的沉浸式背景音乐</p>
       </div>
     </div>
 
+    <!-- Cards Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div 
         v-for="station in stations" 
         :key="station.id"
-        class="bg-bg-secondary rounded-2xl overflow-hidden border border-white/5 shadow-xl group hover:border-white/20 transition-all cursor-pointer relative"
+        class="bg-white border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] group hover:shadow-[8px_8px_0px_0px_rgba(255,0,110,1)] hover:-translate-y-1 transition-all cursor-pointer relative overflow-hidden"
         @click="playStation(station)"
       >
-        <div class="absolute inset-0 bg-gradient-to-t from-bg-primary via-bg-primary/50 to-transparent z-10 pointer-events-none"></div>
-        <img :src="station.cover" class="w-full h-48 object-cover opacity-60 group-hover:opacity-80 transition-opacity" />
+        <img :src="station.cover" class="w-full h-44 object-cover border-b-4 border-black opacity-90 group-hover:opacity-100 transition-opacity" />
         
-        <div class="absolute inset-0 z-20 p-6 flex flex-col justify-end">
-          <div class="flex items-center justify-between">
-            <div>
-              <h3 class="text-xl font-bold text-text-primary mb-1">{{ station.name }}</h3>
-              <p class="text-sm text-text-secondary">{{ station.description }}</p>
-            </div>
-            
-            <button class="w-12 h-12 rounded-full bg-accent-gradient flex items-center justify-center text-white shadow-[0_0_15px_rgba(59,130,246,0.5)] transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all">
-              <Play class="w-5 h-5 ml-1" v-if="musicState.currentStation?.id !== station.id || !musicState.isPlaying" />
-              <Volume2 class="w-5 h-5 animate-pulse" v-else />
-            </button>
+        <div class="p-4 bg-white flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-black text-black uppercase mb-1">{{ station.name }}</h3>
+            <p class="text-xs font-bold text-gray-700 uppercase">{{ station.description }}</p>
           </div>
+          
+          <button class="w-12 h-12 border-2 border-black bg-[#ff006e] text-white flex items-center justify-center font-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] group-hover:bg-cyan-400 group-hover:text-black transition-colors">
+            <Play class="w-5 h-5 ml-0.5" v-if="musicState.currentStation?.id !== station.id || !musicState.isPlaying" />
+            <Volume2 class="w-5 h-5" v-else />
+          </button>
         </div>
         
-        <!-- Active indicator overlay -->
-        <div v-if="musicState.currentStation?.id === station.id" class="absolute inset-0 border-2 border-accent-primary rounded-2xl z-30 pointer-events-none"></div>
+        <!-- Active Badge -->
+        <div v-if="musicState.currentStation?.id === station.id" class="absolute top-2 right-2 bg-lime-400 text-black border-2 border-black px-2 py-0.5 font-black text-xs uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+          PLAYING NOW
+        </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+</style>

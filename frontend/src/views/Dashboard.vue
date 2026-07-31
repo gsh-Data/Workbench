@@ -1,11 +1,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { useEditor, EditorContent } from '@tiptap/vue-3';
-import StarterKit from '@tiptap/starter-kit';
 import TodoWidget from '../components/TodoWidget.vue';
-import SnippetManager from '../components/SnippetManager.vue';
-import CronMonitor from '../components/CronMonitor.vue';
-import { Lightbulb, Send } from '@lucide/vue';
+import TodoCarousel from '../components/TodoCarousel.vue';
 
 const greeting = ref('');
 const timeStr = ref('');
@@ -13,32 +9,11 @@ let timeInterval;
 
 const updateTime = () => {
   const now = new Date();
-  timeStr.value = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  timeStr.value = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   const hour = now.getHours();
-  if (hour < 12) greeting.value = '早上好';
-  else if (hour < 18) greeting.value = '下午好';
-  else greeting.value = '晚上好';
-};
-
-const editor = useEditor({
-  content: '',
-  extensions: [
-    StarterKit,
-  ],
-  editorProps: {
-    attributes: {
-      class: 'prose prose-sm prose-invert focus:outline-none min-h-[100px] max-h-[150px] overflow-y-auto p-4',
-    },
-  },
-});
-
-const saveIdea = () => {
-  const content = editor.value.getHTML();
-  if (!content || content === '<p></p>') return;
-  // TODO: Save to knowledge base / inbox (mocked for now)
-  console.log('Saved idea:', content);
-  editor.value.commands.clearContent();
-  // We can trigger an SSE mock here but this is front-end.
+  if (hour < 12) greeting.value = '早上好 (GOOD MORNING)';
+  else if (hour < 18) greeting.value = '下午好 (GOOD AFTERNOON)';
+  else greeting.value = '晚上好 (GOOD EVENING)';
 };
 
 onMounted(() => {
@@ -48,69 +23,46 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   clearInterval(timeInterval);
-  if (editor.value) editor.value.destroy();
 });
 </script>
 
 <template>
-  <div class="space-y-6">
-    <!-- Welcome Card -->
-    <div class="p-8 rounded-3xl bg-bg-secondary border border-white/5 shadow-2xl relative overflow-hidden">
-      <div class="absolute top-0 right-0 w-64 h-64 bg-accent-primary/20 blur-[100px] rounded-full pointer-events-none"></div>
-      
+  <div class="h-full flex flex-col gap-6">
+    <!-- Geometric Hero Banner Area -->
+    <div class="shrink-0 p-8 bg-yellow-300 border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative flex items-center justify-between">
       <div class="relative z-10">
-        <h1 class="text-4xl font-bold mb-2 text-text-primary">{{ timeStr }}</h1>
-        <p class="text-lg text-text-secondary">{{ greeting }}，创造者。</p>
+        <h1 class="text-5xl md:text-7xl font-black mb-2 text-black tracking-tight font-mono uppercase">{{ timeStr }}</h1>
+        <p class="text-base md:text-lg text-black font-bold uppercase bg-white border-2 border-black inline-block px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+          {{ greeting }} // 几何工作台控制中心
+        </p>
+      </div>
+      <div class="hidden md:flex gap-2 font-black text-4xl">
+        <span class="bg-black text-white px-3 py-1 border-2 border-black">GEO</span>
+        <span class="bg-[#ff006e] text-white px-3 py-1 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">BOLD</span>
       </div>
     </div>
 
-    <!-- Quick Capture & Widgets -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Main Content Split -->
+    <div class="flex-1 grid grid-cols-1 xl:grid-cols-12 gap-6 min-h-0">
       
-      <!-- Left Column: Quick Entry & Todos -->
-      <div class="col-span-1 lg:col-span-2 space-y-6">
-        <!-- Tiptap Quick Entry -->
-        <div class="rounded-2xl bg-bg-secondary border border-white/10 overflow-hidden shadow-md">
-          <div class="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-white/5">
-            <Lightbulb class="w-4 h-4 text-accent-secondary" />
-            <h3 class="text-sm font-semibold">快速记录</h3>
-          </div>
-          <div class="bg-black/20">
-            <editor-content :editor="editor" />
-          </div>
-          <div class="p-2 border-t border-white/5 flex justify-end bg-white/5">
-            <button @click="saveIdea" class="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-accent-gradient text-sm font-medium text-white hover:brightness-110 transition-all">
-              <Send class="w-3 h-3" /> 保存
-            </button>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-           <TodoWidget />
-           <CronMonitor />
+      <!-- Main Work Area -->
+      <div class="col-span-1 xl:col-span-8 flex flex-col gap-6 overflow-y-auto pr-2 custom-scrollbar">
+        <!-- Todos -->
+        <div class="flex-1 min-h-[400px]">
+          <TodoWidget class="h-full" />
         </div>
       </div>
       
-      <!-- Right Column: Snippets -->
-      <div class="col-span-1">
-        <SnippetManager />
+      <!-- Side Widgets -->
+      <div class="col-span-1 xl:col-span-4 flex flex-col gap-6 overflow-y-auto pr-2 custom-scrollbar">
+        <!-- Todo Carousel -->
+        <div class="flex-1 min-h-[400px]">
+          <TodoCarousel class="h-full" />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style>
-/* Tiptap overrides */
-.ProseMirror p {
-  margin-top: 0;
-  margin-bottom: 0.5em;
-  color: #e2e8f0;
-}
-.ProseMirror p.is-editor-empty:first-child::before {
-  content: '在此记录你的想法...';
-  float: left;
-  color: #64748b;
-  pointer-events: none;
-  height: 0;
-}
 </style>

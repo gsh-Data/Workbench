@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { Timer, Activity, Play, Square, Trash2, Plus } from '@lucide/vue';
+import { Timer, Play, Square, Trash2, Plus } from '@lucide/vue';
 import api from '../utils/api';
 
 const cronJobs = ref([]);
@@ -59,46 +59,49 @@ onMounted(fetchJobs);
 </script>
 
 <template>
-  <div class="glass-panel widget">
-    <div class="widget-header">
-      <h2 class="widget-title"><Timer :size="20" color="#10b981" /> 自动化任务</h2>
-      <button @click="isAdding = !isAdding" class="btn-icon">
-        <Plus :size="18" />
+  <div class="bg-white border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col h-[400px] font-mono">
+    <!-- Header -->
+    <div class="p-4 border-b-4 border-black bg-yellow-300 flex justify-between items-center">
+      <h2 class="font-black uppercase text-black text-lg flex items-center gap-2">
+        <Timer :size="22" class="text-black" />
+        自动化任务 (CRON)
+      </h2>
+      <button @click="isAdding = !isAdding" class="p-1 border-2 border-black bg-white hover:bg-yellow-400">
+        <Plus :size="18" class="text-black" />
       </button>
     </div>
     
-    <div class="widget-content">
-      <div v-if="isAdding" class="add-form-container space-y-3">
-        <el-input v-model="newJob.name" placeholder="任务名称 (例如: 每日清理)" />
-        <el-input v-model="newJob.schedule" placeholder="Cron 表达式 (例如: 0 0 * * *)" />
-        <div class="form-actions pt-2">
-          <button @click="isAdding = false" class="btn-cancel">取消</button>
-          <button @click="addJob" class="btn-primary">保存</button>
+    <div class="p-4 flex-1 overflow-y-auto space-y-3">
+      <div v-if="isAdding" class="p-3 border-4 border-black bg-yellow-100 space-y-2">
+        <input v-model="newJob.name" placeholder="任务名称 (例如: 每日清理)" class="w-full border-2 border-black p-2 text-xs font-bold bg-white" />
+        <input v-model="newJob.schedule" placeholder="Cron 表达式 (例如: 0 0 * * *)" class="w-full border-2 border-black p-2 text-xs font-bold bg-white" />
+        <div class="flex justify-end gap-2 pt-1">
+          <button @click="isAdding = false" class="px-3 py-1 border-2 border-black bg-gray-200 text-xs font-bold">取消</button>
+          <button @click="addJob" class="btn-primary text-xs py-1 px-3">保存</button>
         </div>
       </div>
 
-      <div v-if="loading" class="loading">任务加载中...</div>
-      <div v-else-if="cronJobs.length === 0 && !isAdding" class="empty-state">暂无已排期的自动化任务。</div>
+      <div v-if="loading" class="text-center font-bold text-black py-4 text-xs">[加载中...]</div>
+      <div v-else-if="cronJobs.length === 0 && !isAdding" class="text-center font-bold text-black py-4 text-xs bg-yellow-50 border-2 border-black">[暂无自动化任务]</div>
       
-      <div v-else class="job-list">
-        <div v-for="job in cronJobs" :key="job.id" class="job-card" :class="job.status">
-          <div class="job-info">
-            <h3 class="job-name">{{ job.name }}</h3>
-            <div class="job-meta">
-              <span class="job-schedule">{{ job.schedule }}</span>
-              <span class="status-badge">
-                <span class="dot"></span>
+      <div v-else class="space-y-2">
+        <div v-for="job in cronJobs" :key="job.id" class="flex items-center justify-between p-3 border-2 border-black bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+          <div class="flex flex-col gap-1">
+            <h3 class="font-black text-sm text-black uppercase">{{ job.name }}</h3>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-bold bg-black text-white px-1.5 py-0.5 border border-black">{{ job.schedule }}</span>
+              <span class="text-[9px] font-black uppercase px-1.5 py-0.5 border border-black" :class="job.status === 'active' ? 'bg-lime-400 text-black' : 'bg-gray-300 text-black'">
                 {{ job.status }}
               </span>
             </div>
           </div>
-          <div class="job-actions">
-            <button @click="toggleJobStatus(job)" class="btn-icon" :title="job.status === 'active' ? 'Stop' : 'Start'">
-              <Square v-if="job.status === 'active'" :size="16" />
-              <Play v-else :size="16" />
+          <div class="flex gap-1">
+            <button @click="toggleJobStatus(job)" class="p-1.5 border-2 border-black bg-white hover:bg-yellow-300">
+              <Square v-if="job.status === 'active'" :size="14" />
+              <Play v-else :size="14" />
             </button>
-            <button @click="deleteJob(job.id)" class="btn-icon delete-btn" title="Delete">
-              <Trash2 :size="16" />
+            <button @click="deleteJob(job.id)" class="p-1.5 border-2 border-black bg-red-500 text-white hover:bg-red-600">
+              <Trash2 :size="14" />
             </button>
           </div>
         </div>
@@ -108,157 +111,4 @@ onMounted(fetchJobs);
 </template>
 
 <style scoped>
-.widget {
-  display: flex;
-  flex-direction: column;
-  height: 400px;
-}
-
-.widget-header {
-  padding: 1.2rem 1.5rem;
-  border-bottom: 1px solid var(--border-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.widget-title {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-.widget-content {
-  padding: 1.5rem;
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.add-form-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  background: rgba(0,0,0,0.2);
-  padding: 1rem;
-  border-radius: var(--border-radius-md);
-  border: 1px solid var(--border-color);
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.btn-cancel {
-  padding: 0.6rem 1rem;
-  color: var(--text-secondary);
-  border-radius: var(--border-radius-sm);
-  transition: var(--transition-fast);
-}
-
-.btn-cancel:hover {
-  background: rgba(255,255,255,0.05);
-  color: var(--text-primary);
-}
-
-.job-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.job-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-sm);
-  padding: 1rem;
-  transition: var(--transition-fast);
-}
-
-.job-card:hover {
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.job-card.active {
-  border-left: 3px solid #10b981;
-}
-
-.job-card.inactive {
-  border-left: 3px solid var(--text-secondary);
-  opacity: 0.8;
-}
-
-.job-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.job-name {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.job-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.job-schedule {
-  font-family: monospace;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  background: rgba(0,0,0,0.3);
-  padding: 0.1rem 0.4rem;
-  border-radius: 4px;
-}
-
-.status-badge {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-}
-
-.status-badge .dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: var(--text-secondary);
-}
-
-.job-card.active .status-badge .dot {
-  background-color: #10b981;
-  box-shadow: 0 0 5px #10b981;
-}
-
-.job-actions {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.delete-btn:hover {
-  color: #ef4444;
-}
-
-.empty-state, .loading {
-  text-align: center;
-  color: var(--text-secondary);
-  padding: 2rem 0;
-  font-size: 0.9rem;
-}
 </style>
