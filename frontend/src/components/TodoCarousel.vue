@@ -29,53 +29,63 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="bg-white border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col h-full relative overflow-hidden">
-    <div class="p-4 border-b-4 border-black bg-[#ff006e] text-white flex items-center justify-between shrink-0">
-      <h3 class="font-black uppercase tracking-wider text-white flex items-center gap-2 text-lg">
-        <Clock class="w-5 h-5 text-white" />
-        焦点任务 (FOCUS)
+  <div class="bg-white border border-zinc-200 rounded-xl shadow-sm flex flex-col h-full overflow-hidden">
+    <div class="px-6 py-4 border-b border-zinc-100 bg-white flex items-center justify-between shrink-0">
+      <h3 class="font-semibold text-base text-zinc-900 tracking-tight flex items-center gap-2">
+        <Clock class="w-4 h-4 text-blue-600" />
+        <span>焦点任务 (Focus Tasks)</span>
       </h3>
     </div>
     
-    <div class="flex-1 relative p-4 bg-white">
-      <div v-if="loading" class="absolute inset-0 flex items-center justify-center text-black font-black text-sm">
-        [加载中...]
+    <div class="flex-1 relative p-6 bg-white">
+      <div v-if="loading" class="absolute inset-0 flex items-center justify-center text-zinc-400 font-medium text-sm">
+        加载焦点任务...
       </div>
-      <div v-else-if="todos.length === 0" class="absolute inset-0 flex items-center justify-center text-black font-black text-sm">
-        [暂无焦点任务]
+      <div v-else-if="todos.length === 0" class="absolute inset-0 flex items-center justify-center text-zinc-400 font-medium text-sm">
+        暂无焦点任务
       </div>
       
-      <el-carousel v-else class="h-full w-full border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" arrow="hover" :interval="4000">
+      <el-carousel v-else class="h-full w-full rounded-lg border border-zinc-200 overflow-hidden shadow-sm" arrow="hover" :interval="4000">
         <el-carousel-item v-for="todo in todos" :key="todo.id" class="h-full">
-          <div class="h-full flex flex-col justify-between p-6 relative overflow-hidden"
-               :class="{
-                 'bg-lime-300 text-black': todo.status === 'completed',
-                 'bg-yellow-300 text-black': todo.status === 'in-progress',
-                 'bg-[#00f0ff] text-black': todo.status !== 'completed' && todo.status !== 'in-progress'
-               }">
-            
+          <div 
+            class="h-full flex flex-col justify-between p-6 relative overflow-hidden transition-colors"
+            :class="{
+              'bg-emerald-50 text-emerald-900': todo.status === 'completed',
+              'bg-blue-50 text-blue-900': todo.status === 'in-progress',
+              'bg-zinc-50 text-zinc-900': todo.status !== 'completed' && todo.status !== 'in-progress'
+            }"
+          >
             <!-- Top bar: Status -->
             <div class="flex items-center justify-between mb-4">
-              <div class="inline-flex items-center gap-2 px-3 py-1 bg-black text-white font-black text-xs uppercase border-2 border-black">
-                <span class="w-2.5 h-2.5 border border-white"
-                      :class="todo.status === 'completed' ? 'bg-lime-400' : (todo.status === 'in-progress' ? 'bg-yellow-400' : 'bg-cyan-400')"></span>
+              <div 
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-md text-xs font-semibold"
+                :class="{
+                  'bg-emerald-100 text-emerald-700': todo.status === 'completed',
+                  'bg-blue-100 text-blue-700': todo.status === 'in-progress',
+                  'bg-zinc-200 text-zinc-700': todo.status !== 'completed' && todo.status !== 'in-progress'
+                }"
+              >
+                <span 
+                  class="w-2 h-2 rounded-full"
+                  :class="todo.status === 'completed' ? 'bg-emerald-500' : (todo.status === 'in-progress' ? 'bg-blue-500' : 'bg-zinc-500')"
+                ></span>
                 {{ todo.status === 'completed' ? '已完成' : (todo.status === 'in-progress' ? '进行中' : '待处理') }}
               </div>
               
-              <CheckCircle2 v-if="todo.status === 'completed'" class="w-8 h-8 text-black" />
-              <Clock v-else-if="todo.status === 'in-progress'" class="w-8 h-8 text-black" />
-              <Circle v-else class="w-8 h-8 text-black" />
+              <CheckCircle2 v-if="todo.status === 'completed'" class="w-6 h-6 text-emerald-600" />
+              <Clock v-else-if="todo.status === 'in-progress'" class="w-6 h-6 text-blue-600" />
+              <Circle v-else class="w-6 h-6 text-zinc-400" />
             </div>
             
             <!-- Main Title -->
             <div class="flex-1 flex items-center">
-              <h2 class="text-2xl md:text-3xl font-black text-black leading-tight uppercase tracking-tight line-clamp-3">
+              <h2 class="text-xl md:text-2xl font-semibold tracking-tight leading-tight line-clamp-3">
                 {{ todo.text }}
               </h2>
             </div>
             
-            <!-- Bottom decorative accent -->
-            <div class="w-16 h-3 bg-black mt-4"></div>
+            <!-- Bottom decorative bar -->
+            <div class="w-12 h-1 bg-blue-600 rounded-full mt-4"></div>
           </div>
         </el-carousel-item>
       </el-carousel>
@@ -91,19 +101,21 @@ onMounted(() => {
   height: 100% !important;
 }
 :deep(.el-carousel__indicators) {
-  background: #000000;
+  background: rgba(24, 24, 27, 0.7);
   padding: 4px 8px;
-  border: 2px solid #000000;
+  border-radius: 9999px;
   margin-bottom: 8px;
 }
 :deep(.el-carousel__button) {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
   background-color: #ffffff;
-  opacity: 1;
+  opacity: 0.6;
 }
 :deep(.el-carousel__indicator.is-active .el-carousel__button) {
-  background-color: #ff006e;
-  width: 16px;
+  background-color: #3b82f6;
+  opacity: 1;
+  width: 14px;
 }
 </style>

@@ -1,11 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { CheckSquare, Square, Play, Trash2, Plus, ListTodo, FileText, X } from '@lucide/vue';
+import { CheckSquare, Square, Play, Trash2, Plus, ListTodo, FileText, X, Sparkles } from '@lucide/vue';
 import api from '../utils/api';
 
 const todos = ref([]);
 const newTodoText = ref('');
 const loading = ref(true);
+const isDecomposing = ref(false);
 
 const snippets = ref([]);
 const selectedTodoSnippets = ref([]);
@@ -34,6 +35,26 @@ const addTodo = async () => {
     newTodoText.value = '';
   } catch (error) {
     console.error('Failed to add todo:', error);
+  }
+};
+
+const aiDecomposeTask = async () => {
+  if (!newTodoText.value.trim() || isDecomposing.value) return;
+  isDecomposing.value = true;
+  try {
+    const res = await api.post('/ai/decompose-task', { taskText: newTodoText.value.trim() });
+    if (res.data && res.data.subtasks && res.data.subtasks.length > 0) {
+      for (const subtask of res.data.subtasks) {
+        const added = await api.post('/todos', { text: `[AI 拆解] ${subtask}` });
+        todos.value.push(added.data);
+      }
+      newTodoText.value = '';
+    }
+  } catch (error) {
+    console.error('AI Decompose failed:', error);
+    alert('AI 任务拆解失败，请确认是否已配置 DeepSeek API Key');
+  } finally {
+    isDecomposing.value = false;
   }
 };
 
@@ -68,71 +89,90 @@ const deleteTodo = async (id) => {
   }
 };
 
-const openSnippetModal = (todoId) => {
-  selectedTodoSnippets.value = snippets.value.filter(s => s.taskId === todoId);
+const openSnippetModal = (taskId) => {
+  selectedTodoSnippets.value = snippets.value.filter(s => s.taskId === taskId);
   showSnippetModal.value = true;
 };
 
 const closeSnippetModal = () => {
   showSnippetModal.value = false;
+  selectedTodoSnippets.value = [];
 };
 
 onMounted(fetchData);
 </script>
 
 <template>
-  <div class="bg-white border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col h-[420px]">
-    <!-- Header -->
-    <div class="p-4 border-b-4 border-black bg-yellow-300 flex items-center justify-between">
-      <h2 class="font-black uppercase tracking-wider text-black text-lg flex items-center gap-2">
-        <ListTodo :size="22" class="text-black" />
-        待办任务 (TODOS)
+  <div class="bg-white rounded-xl border border-zinc-200 shadow-sm flex flex-col h-full overflow-hidden">
+    <div class="px-6 py-4 border-b border-zinc-100 flex items-center justify-between bg-white shrink-0">
+      <h2 class="font-semibold text-base text-zinc-900 tracking-tight flex items-center gap-2">
+        <ListTodo class="w-4 h-4 text-blue-600" />
+        <span>任务清单 (Tasks)</span>
       </h2>
+      <span class="text-xs text-zinc-500 font-medium bg-zinc-100 px-2.5 py-1 rounded-md">
+        共 {{ todos.length }} 项
+      </span>
     </div>
     
-    <div class="p-4 flex-1 flex flex-col gap-4 overflow-hidden">
+    <div class="p-6 flex-1 flex flex-col gap-4 overflow-hidden">
       <!-- Input Form -->
       <form @submit.prevent="addTodo" class="flex gap-2 shrink-0">
         <input 
           v-model="newTodoText" 
-          placeholder="输入新任务名称..." 
-          class="flex-1 border-3 border-black bg-white px-3 py-2 font-bold text-sm focus:bg-yellow-200 outline-none transition-colors border-2"
+          placeholder="输入新任务名称 (或复杂目标，如: 准备下周产品发布会)..." 
+          class="flex-1 bg-zinc-100 border-0 rounded-lg text-sm px-3.5 py-2 text-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
         />
-        <button type="submit" class="bg-[#ff006e] text-white px-4 py-2 font-black border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all">
-          <Plus :size="20" />
+        <button 
+          type="button" 
+          @click="aiDecomposeTask"
+          :disabled="isDecomposing || !newTodoText.trim()"
+          class="bg-gradient-to-r from-purple-500 to-rose-500 text-white px-3 py-2 rounded-lg font-semibold text-xs hover:from-purple-600 hover:to-rose-600 transition-all flex items-center gap-1 shrink-0 disabled:opacity-50 shadow-sm"
+          title="使用 DeepSeek AI 智能拆解为多个子步骤"
+        >
+          <Sparkles class="w-3.5 h-3.5 text-yellow-200 animate-pulse" />
+          <span>{{ isDecomposing ? 'AI 拆解中...' : 'AI 拆解' }}</span>
+        </button>
+        <button 
+          type="submit" 
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors flex items-center gap-1 shrink-0"
+        >
+          <Plus :size="18" />
+          <span>添加</span>
         </button>
       </form>
 
-      <div v-if="loading" class="text-center font-bold text-black py-6 text-sm">[加载任务中...]</div>
-      <div v-else-if="todos.length === 0" class="text-center font-bold text-black py-6 text-sm bg-yellow-100 border-2 border-black">[暂无任务]</div>
+      <div v-if="loading" class="text-center font-medium text-zinc-400 py-8 text-sm">加载任务中...</div>
+      <div v-else-if="todos.length === 0" class="text-center font-medium text-zinc-500 py-8 text-sm bg-zinc-50 rounded-lg border border-dashed border-zinc-200">
+        暂无待办任务，在上方添加新任务
+      </div>
       
-      <ul v-else class="flex-1 overflow-y-auto pr-1 space-y-2">
+      <ul v-else class="flex-1 overflow-y-auto pr-1 space-y-2.5">
         <li 
           v-for="todo in todos" 
           :key="todo.id" 
-          class="group flex items-center gap-3 p-3 border-2 border-black transition-all bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-yellow-100"
+          class="group flex items-center gap-3 p-3 rounded-lg border border-zinc-200 bg-white hover:border-zinc-300 transition-all shadow-sm"
           :class="[
-            todo.status === 'in-progress' ? 'bg-yellow-300 font-black' : '',
-            (todo.status === 'done' || todo.completed) ? 'bg-gray-200 opacity-60' : ''
+            todo.status === 'in-progress' ? 'bg-amber-50/50 border-amber-200' : '',
+            (todo.status === 'done' || todo.completed) ? 'bg-zinc-50 opacity-75' : ''
           ]"
         >
-          <button @click="toggleTodo(todo)" class="shrink-0 hover:scale-110 transition-transform">
-            <CheckSquare v-if="(todo.status === 'done' || todo.completed)" :size="20" class="text-black bg-lime-400 border border-black" />
-            <Play v-else-if="todo.status === 'in-progress'" :size="20" class="text-black bg-cyan-400 border border-black p-0.5" />
-            <Square v-else :size="20" class="text-black" />
+          <button @click="toggleTodo(todo)" class="shrink-0 text-zinc-400 hover:text-zinc-600 transition-colors">
+            <CheckSquare v-if="(todo.status === 'done' || todo.completed)" :size="18" class="text-emerald-600" />
+            <Play v-else-if="todo.status === 'in-progress'" :size="18" class="text-amber-600" />
+            <Square v-else :size="18" class="text-zinc-400" />
           </button>
           
           <div class="flex-1 truncate">
             <span 
-              class="text-sm font-bold uppercase transition-colors" 
+              class="text-sm font-medium transition-colors" 
               :class="{ 
-                'line-through text-gray-700': (todo.status === 'done' || todo.completed), 
-                'text-black': todo.status !== 'done'
+                'line-through text-zinc-400': (todo.status === 'done' || todo.completed), 
+                'text-zinc-900': todo.status !== 'done'
               }"
             >
               {{ todo.text }}
             </span>
-            <span v-if="todo.dueDate" class="text-[10px] ml-2 px-1.5 py-0.5 border border-black bg-white text-black font-mono font-bold">
+            <span v-if="todo.dueDate" class="text-[11px] ml-2 px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 font-mono">
               {{ todo.dueDate }}
             </span>
           </div>
@@ -141,42 +181,42 @@ onMounted(fetchData);
           <button 
             v-if="snippets.filter(s => s.taskId === todo.id).length > 0"
             @click="openSnippetModal(todo.id)"
-            class="flex items-center gap-1 text-[10px] px-2 py-0.5 font-bold bg-[#00f0ff] text-black border border-black hover:bg-cyan-300 transition-colors shrink-0 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
+            class="flex items-center gap-1 text-xs px-2.5 py-1 rounded-md font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors shrink-0 border border-blue-100"
           >
-            <FileText :size="12" />
+            <FileText :size="13" />
             笔记 ({{ snippets.filter(s => s.taskId === todo.id).length }})
           </button>
 
-          <button @click="deleteTodo(todo.id)" class="shrink-0 opacity-0 group-hover:opacity-100 p-1 border border-black bg-red-500 text-white hover:bg-red-600 transition-opacity">
-            <Trash2 :size="14" />
+          <button @click="deleteTodo(todo.id)" class="shrink-0 opacity-0 group-hover:opacity-100 p-1.5 rounded text-zinc-400 hover:text-rose-600 hover:bg-rose-50 transition-all">
+            <Trash2 :size="15" />
           </button>
         </li>
       </ul>
     </div>
   </div>
 
-  <!-- Snippet Modal (Teleported to body) -->
+  <!-- Snippet Modal -->
   <Teleport to="body">
-    <div v-if="showSnippetModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60" @click.self="closeSnippetModal">
-      <div class="bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] w-full max-w-lg">
-        <div class="flex justify-between items-center mb-4 pb-2 border-b-4 border-black">
-          <h3 class="text-lg font-black uppercase flex items-center gap-2 text-black">
-            <FileText class="w-5 h-5 text-black" />
+    <div v-if="showSnippetModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-900/40 backdrop-blur-sm" @click.self="closeSnippetModal">
+      <div class="bg-white border border-zinc-200 rounded-xl p-6 shadow-md w-full max-w-lg">
+        <div class="flex justify-between items-center mb-4 pb-3 border-b border-zinc-100">
+          <h3 class="text-base font-semibold text-zinc-900 flex items-center gap-2">
+            <FileText class="w-4 h-4 text-blue-600" />
             关联知识片段
           </h3>
-          <button @click="closeSnippetModal" class="p-1 border-2 border-black bg-yellow-300 text-black hover:bg-yellow-400">
+          <button @click="closeSnippetModal" class="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100">
             <X class="w-4 h-4" />
           </button>
         </div>
-        <div class="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
-          <div v-for="snippet in selectedTodoSnippets" :key="snippet.id" class="bg-yellow-100 border-2 border-black p-4">
-            <h4 class="font-black text-sm text-black mb-2 flex items-center justify-between">
+        <div class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+          <div v-for="snippet in selectedTodoSnippets" :key="snippet.id" class="bg-zinc-50 border border-zinc-200 rounded-lg p-4">
+            <h4 class="font-semibold text-sm text-zinc-900 mb-2 flex items-center justify-between">
               <span>{{ snippet.title }}</span>
               <div v-if="snippet.tags && snippet.tags.length" class="flex gap-1">
-                <span v-for="tag in snippet.tags" :key="tag" class="text-[9px] font-bold px-1.5 py-0.5 bg-black text-white">#{{ tag }}</span>
+                <span v-for="tag in snippet.tags" :key="tag" class="text-[10px] font-medium px-2 py-0.5 bg-zinc-200 text-zinc-700 rounded">#{{ tag }}</span>
               </div>
             </h4>
-            <pre class="text-xs text-black bg-white p-3 font-mono border-2 border-black overflow-x-auto"><code>{{ snippet.code }}</code></pre>
+            <pre class="text-xs text-zinc-800 bg-white p-3 font-mono border border-zinc-200 rounded-md overflow-x-auto"><code>{{ snippet.code }}</code></pre>
           </div>
         </div>
       </div>

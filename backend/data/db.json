@@ -15,12 +15,71 @@
       "completed": false,
       "status": "in-progress",
       "dueDate": "2026-07-31"
+    },
+    {
+      "id": "1785663590561",
+      "text": "333",
+      "completed": false,
+      "status": "in-progress",
+      "createdAt": "2026-08-02T09:39:50.562Z",
+      "completedAt": null
+    },
+    {
+      "id": "1785663648139",
+      "text": "[AI 拆解] 收集关于3333的相关信息和需求",
+      "completed": false,
+      "status": "todo",
+      "createdAt": "2026-08-02T09:40:48.139Z"
+    },
+    {
+      "id": "1785663648176",
+      "text": "[AI 拆解] 分析3333的业务流程或逻辑",
+      "completed": false,
+      "status": "todo",
+      "createdAt": "2026-08-02T09:40:48.176Z"
+    },
+    {
+      "id": "1785663648204",
+      "text": "[AI 拆解] 确定3333的目标和关键绩效指标(KPIs)",
+      "completed": false,
+      "status": "todo",
+      "createdAt": "2026-08-02T09:40:48.204Z"
+    },
+    {
+      "id": "1785663648230",
+      "text": "[AI 拆解] 设计333的具体解决方案或框架",
+      "completed": false,
+      "status": "todo",
+      "createdAt": "2026-08-02T09:40:48.230Z"
+    },
+    {
+      "id": "1785663648256",
+      "text": "[AI 拆解] 制定实施计划并分配资源",
+      "completed": false,
+      "status": "todo",
+      "createdAt": "2026-08-02T09:40:48.256Z"
     }
   ],
   "docsMetadata": [
     {
       "filename": "新建任务.md",
       "taskId": "1785317566304"
+    }
+  ],
+  "aiConfig": [
+    {
+      "provider": "local",
+      "apiKey": "sk-f...3cae",
+      "endpointId": "",
+      "localUrl": "http://127.0.0.1:11434",
+      "localModel": "deepseek-r1:32b",
+      "updatedAt": "2026-08-02T08:44:10.501Z"
+    }
+  ],
+  "scratchpad": [
+    {
+      "content": "cccc",
+      "updatedAt": "2026-08-02T09:39:28.833Z"
     }
   ]
 }
